@@ -14,13 +14,13 @@ server = app.server
 
 app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
-df = pd.read_csv('http://7xpvdr.com1.z0.glb.clouddn.com/nama_10_gdp_1_Data.csv')
+df = pd.read_csv('http://7xpvdr.com1.z0.glb.clouddn.com/nama_10_gdp_1_Data_2.csv')
 
-available_indicatorsX = df['GEO'].unique()
-available_indicatorsY = df['UNIT'].unique()
+available_indicatorsX = df['NA_ITEM'].unique()
+available_indicatorsY = df['NA_ITEM'].unique()
 
 available_indicatorsX_lineChart = df['GEO'].unique()
-available_indicatorsY_lineChart = df['UNIT'].unique()
+available_indicatorsY_lineChart = df['NA_ITEM'].unique()
 
 app.layout = html.Div([
     html.Div([
@@ -28,14 +28,14 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='xaxis-column',
                 options=[{'label': i, 'value': i} for i in available_indicatorsX],
-                value='European Union (28 countries)'
-            ),
-            dcc.RadioItems(
-                id='xaxis-type',
-                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-                value='Linear',
-                labelStyle={'display': 'inline-block'}
+                value='Gross domestic product at market prices'
             )
+            # dcc.RadioItems(
+                # id='xaxis-type',
+                # options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                # value='Linear',
+                # labelStyle={'display': 'inline-block'}
+            # )
         ],
         style={'width': '48%', 'display': 'inline-block'}),
 
@@ -43,14 +43,14 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='yaxis-column',
                 options=[{'label': i, 'value': i} for i in available_indicatorsY],
-                value='Current prices, million euro'
-            ),
-			dcc.RadioItems(
-                id='yaxis-type',
-                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-                value='Linear',
-                labelStyle={'display': 'inline-block'}
+                value='Value added, gross'
             )
+		# dcc.RadioItems(
+                # id='yaxis-type',
+                # options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                # value='Linear',
+                # labelStyle={'display': 'inline-block'}
+            # )
 
         ],
         style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
@@ -65,7 +65,7 @@ app.layout = html.Div([
         value=df['TIME'].max(),
         step=None,
         marks={str(year): str(year) for year in df['TIME'].unique()}
-    ), 
+    ),
 
 #####################
 
@@ -73,30 +73,30 @@ app.layout = html.Div([
         html.Div([
             dcc.Dropdown(
                 id='xaxis-column_LC',
-                options=[{'label': i, 'value': i} for i in available_indicatorsX],
+                options=[{'label': i, 'value': i} for i in available_indicatorsX_lineChart],
                 value='European Union (28 countries)'
-            ),
-            dcc.RadioItems(
-                id='xaxis-type_LC',
-                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-                value='Linear',
-                labelStyle={'display': 'inline-block'}
             )
+            # dcc.RadioItems(
+                # id='xaxis-type_LC',
+                # options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                # value='Linear',
+                # labelStyle={'display': 'inline-block'}
+            # )
         ],
         style={'width': '48%', 'display': 'inline-block'}),
 
         html.Div([
             dcc.Dropdown(
                 id='yaxis-column_LC',
-                options=[{'label': i, 'value': i} for i in available_indicatorsY],
-                value='Current prices, million euro'
-            ),
-	    dcc.RadioItems(
-                id='yaxis-type_LC',
-                options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
-                value='Linear',
-                labelStyle={'display': 'inline-block'}
+                options=[{'label': i, 'value': i} for i in available_indicatorsY_lineChart],
+                value='Gross domestic product at market prices'
             )
+            # dcc.RadioItems(
+                # id='yaxis-type_LC',
+                # options=[{'label': i, 'value': i} for i in ['Linear', 'Log']],
+                # value='Linear',
+                # labelStyle={'display': 'inline-block'}
+            # )
 
         ],
         style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
@@ -111,26 +111,20 @@ app.layout = html.Div([
         value=df['TIME'].max(),
         step=None,
         marks={str(year): str(year) for year in df['TIME'].unique()}
-    ) 
+    )
 ])
 
 @app.callback(
     dash.dependencies.Output('indicator-graphic', 'figure'),
     [dash.dependencies.Input('xaxis-column', 'value'),
      dash.dependencies.Input('yaxis-column', 'value'),
-     # dash.dependencies.Input('xaxis-type', 'value'),
-     # dash.dependencies.Input('yaxis-type', 'value'),
      dash.dependencies.Input('year--slider', 'value')])
-# def update_graph(xaxis_column_name, yaxis_column_name,
-                 # xaxis_type, yaxis_type,
-                 # year_value):
 def update_graph(xaxis_column_name, yaxis_column_name, year_value):
     dff = df[df['TIME'] == year_value]
-    
     return {
         'data': [go.Scatter(
-            x=dff[dff['GEO'] == xaxis_column_name]['Value'],
-            y=dff[dff['UNIT'] == yaxis_column_name]['Value'],
+            x=dff[dff['NA_ITEM'] == xaxis_column_name]['Value'],
+            y=dff[dff['NA_ITEM'] == yaxis_column_name]['Value'],
             mode='markers',
             marker={
                 'size': 15,
@@ -163,7 +157,7 @@ def update_graph_lineChart(xaxis_column_name, yaxis_column_name, year_value):
     return {
         'data': [go.Scatter(
             x=dff[dff['GEO'] == xaxis_column_name]['Value'],
-            y=dff[dff['UNIT'] == yaxis_column_name]['Value'],
+            y=dff[dff['NA_ITEM'] == yaxis_column_name]['Value'],
             mode='line',
             marker={
                 'size': 15,
@@ -185,4 +179,14 @@ def update_graph_lineChart(xaxis_column_name, yaxis_column_name, year_value):
 
 if __name__ == '__main__':
     app.run_server()
+
+
+# In[ ]:
+
+
+
+
+# In[ ]:
+
+
 
