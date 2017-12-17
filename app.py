@@ -102,16 +102,7 @@ app.layout = html.Div([
         style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
     ]),
 
-    dcc.Graph(id='line-chart'),
-
-    dcc.Slider(
-        id='year--slider_LC',
-        min=df['TIME'].min(),
-        max=df['TIME'].max(),
-        value=df['TIME'].max(),
-        step=None,
-        marks={str(year): str(year) for year in df['TIME'].unique()}
-    )
+    dcc.Graph(id='line-chart')
 ])
 
 @app.callback(
@@ -149,15 +140,16 @@ def update_graph(xaxis_column_name, yaxis_column_name, year_value):
 @app.callback(
     dash.dependencies.Output('line-chart', 'figure'),
     [dash.dependencies.Input('xaxis-column_LC', 'value'),
-     dash.dependencies.Input('yaxis-column_LC', 'value'),
-     dash.dependencies.Input('year--slider_LC', 'value')])
-def update_graph_lineChart(xaxis_column_name, yaxis_column_name, year_value):
-    dff = df[df['TIME'] == year_value]
+     dash.dependencies.Input('yaxis-column_LC', 'value')])
+def update_graph_lineChart(xaxis_column_name, yaxis_column_name):
+    #dff = df[df['TIME'] == year_value]
     
     return {
         'data': [go.Scatter(
-            x=dff[dff['GEO'] == xaxis_column_name]['Value'],
-            y=dff[dff['NA_ITEM'] == yaxis_column_name]['Value'],
+            x = df['TIME'].unique(), 
+            y = df[(df['NA_ITEM'] == yaxis_column_name) & (df['GEO'] == xaxis_column_name)]['Value'],
+            #x=dff[dff['GEO'] == xaxis_column_name]['Value'],
+            #y=dff[dff['NA_ITEM'] == yaxis_column_name]['Value'],
             mode='line',
             marker={
                 'size': 15,
@@ -167,7 +159,7 @@ def update_graph_lineChart(xaxis_column_name, yaxis_column_name, year_value):
         )],
         'layout': go.Layout(
             xaxis={
-                'title': xaxis_column_name
+                'title': 'year'
             },
             yaxis={
                 'title': yaxis_column_name
